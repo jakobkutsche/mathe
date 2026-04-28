@@ -1,1 +1,843 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Analytische Geometrie – 3D Lernweg</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"/>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#0a0a0f;
+  --bg2:#12121a;
+  --bg3:#1a1a26;
+  --card:#1e1e2e;
+  --border:#2a2a40;
+  --border2:#3a3a58;
+  --text:#e8e8f0;
+  --muted:#7070a0;
+  --accent:#7c6af7;
+  --accent2:#4ecdc4;
+  --accent3:#f7c948;
+  --red:#f76c6c;
+  --green:#6cf7a0;
+  --font:'Space Grotesk',sans-serif;
+  --mono:'JetBrains Mono',monospace;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:16px;line-height:1.6;overflow-x:hidden}
 
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(10,10,15,0.85);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 2rem;height:56px;display:flex;align-items:center;gap:2rem}
+.nav-logo{font-size:14px;font-weight:600;letter-spacing:0.08em;color:var(--accent);text-transform:uppercase}
+.nav-steps{display:flex;gap:1rem;margin-left:auto}
+.nav-step{font-size:12px;font-weight:500;color:var(--muted);cursor:pointer;padding:4px 10px;border-radius:20px;border:1px solid transparent;transition:all .2s;text-decoration:none}
+.nav-step:hover{color:var(--text);border-color:var(--border2)}
+.nav-step.active{color:var(--accent);border-color:var(--accent);background:rgba(124,106,247,0.1)}
+
+/* HERO */
+.hero{min-height:100vh;display:flex;align-items:center;justify-content:center;text-align:center;padding:80px 2rem 4rem;position:relative;overflow:hidden}
+.hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse 80% 50% at 50% 0%,rgba(124,106,247,0.15) 0%,transparent 70%)}
+.hero-grid{position:absolute;inset:0;background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);background-size:40px 40px;opacity:0.3}
+.hero-content{position:relative;z-index:1;max-width:700px}
+.hero-tag{display:inline-block;font-size:11px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--accent2);border:1px solid rgba(78,205,196,0.3);border-radius:20px;padding:4px 14px;margin-bottom:1.5rem}
+h1{font-size:clamp(2.5rem,6vw,4.5rem);font-weight:700;line-height:1.05;letter-spacing:-0.02em;margin-bottom:1.5rem}
+h1 span{color:var(--accent)}
+.hero-sub{font-size:18px;color:var(--muted);margin-bottom:3rem;max-width:500px;margin-left:auto;margin-right:auto}
+.hero-steps{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:12px 24px;border-radius:8px;font-family:var(--font);font-size:14px;font-weight:600;cursor:pointer;border:none;text-decoration:none;transition:all .2s}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{background:#9080ff;transform:translateY(-1px)}
+.btn-ghost{background:transparent;color:var(--text);border:1px solid var(--border2)}
+.btn-ghost:hover{border-color:var(--accent);color:var(--accent)}
+
+/* SECTION */
+section{padding:80px 0;scroll-margin-top:60px}
+.container{max-width:1100px;margin:0 auto;padding:0 2rem}
+.section-label{font-size:11px;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;color:var(--accent);margin-bottom:.5rem}
+.section-title{font-size:clamp(1.8rem,4vw,2.8rem);font-weight:700;letter-spacing:-0.02em;margin-bottom:1rem}
+.section-sub{color:var(--muted);font-size:17px;max-width:540px;margin-bottom:3rem}
+.divider{width:48px;height:3px;background:var(--accent);border-radius:2px;margin-bottom:2rem}
+
+/* 3D CANVAS CARD */
+.scene-card{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;margin-bottom:2rem}
+.scene-header{padding:1rem 1.5rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:between;gap:1rem}
+.scene-title-wrap{flex:1}
+.scene-title{font-size:15px;font-weight:600}
+.scene-hint{font-size:12px;color:var(--muted);margin-top:2px}
+.scene-controls{display:flex;gap:.5rem;margin-left:auto}
+.ctrl-btn{background:var(--bg3);border:1px solid var(--border);border-radius:6px;color:var(--muted);font-family:var(--font);font-size:12px;padding:5px 12px;cursor:pointer;transition:all .2s}
+.ctrl-btn:hover,.ctrl-btn.active{background:rgba(124,106,247,0.15);border-color:var(--accent);color:var(--accent)}
+canvas.three{display:block;width:100%!important;height:380px!important}
+
+/* FORMULA CARD */
+.formula-box{background:var(--bg3);border:1px solid var(--border2);border-radius:12px;padding:1.5rem;margin:1.5rem 0;font-family:var(--mono);font-size:15px;position:relative;overflow:hidden}
+.formula-box::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--accent)}
+.formula-label{font-size:11px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--accent);margin-bottom:.75rem;font-family:var(--font)}
+.formula-main{font-size:18px;color:var(--accent3);font-weight:600}
+.formula-parts{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.75rem}
+.formula-part{background:rgba(78,205,196,0.1);border:1px solid rgba(78,205,196,0.2);border-radius:6px;padding:4px 10px;font-size:13px;color:var(--accent2)}
+
+/* INFO GRID */
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:2rem}
+@media(max-width:640px){.info-grid{grid-template-columns:1fr}}
+.info-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:1.5rem;transition:border-color .2s}
+.info-card:hover{border-color:var(--border2)}
+.info-icon{font-size:24px;margin-bottom:.75rem}
+.info-card h3{font-size:15px;font-weight:600;margin-bottom:.5rem}
+.info-card p{font-size:14px;color:var(--muted);line-height:1.6}
+.tag{display:inline-block;font-size:11px;font-weight:600;padding:3px 9px;border-radius:12px;margin-top:.75rem}
+.tag-purple{background:rgba(124,106,247,0.15);color:var(--accent)}
+.tag-teal{background:rgba(78,205,196,0.15);color:var(--accent2)}
+.tag-yellow{background:rgba(247,201,72,0.15);color:var(--accent3)}
+.tag-red{background:rgba(247,108,108,0.15);color:var(--red)}
+
+/* QUIZ */
+.quiz-box{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:2rem;margin-top:2rem}
+.quiz-q{font-size:17px;font-weight:600;margin-bottom:1.5rem}
+.quiz-opts{display:flex;flex-direction:column;gap:.75rem}
+.quiz-opt{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:1rem 1.25rem;cursor:pointer;font-size:15px;transition:all .2s;text-align:left;font-family:var(--font);color:var(--text);display:flex;align-items:center;gap:.75rem}
+.quiz-opt:hover{border-color:var(--border2);background:var(--bg2)}
+.quiz-opt.correct{border-color:var(--green);background:rgba(108,247,160,0.08);color:var(--green)}
+.quiz-opt.wrong{border-color:var(--red);background:rgba(247,108,108,0.08);color:var(--red)}
+.quiz-opt .opt-letter{width:28px;height:28px;border-radius:50%;border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;flex-shrink:0}
+.quiz-feedback{margin-top:1.5rem;padding:1rem 1.25rem;border-radius:10px;font-size:15px;display:none}
+.quiz-feedback.show{display:block}
+.quiz-feedback.ok{background:rgba(108,247,160,0.08);border:1px solid rgba(108,247,160,0.3);color:var(--green)}
+.quiz-feedback.err{background:rgba(247,108,108,0.08);border:1px solid rgba(247,108,108,0.3);color:var(--red)}
+
+/* STEP TRACKER */
+.progress-bar{background:var(--bg3);border:1px solid var(--border);border-radius:50px;height:6px;margin-bottom:3rem;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:50px;transition:width .6s ease}
+
+/* VECTOR DEMO INTERACTIVE */
+.slider-row{display:flex;align-items:center;gap:1rem;margin:.5rem 0}
+.slider-row label{font-size:13px;color:var(--muted);width:80px;font-family:var(--mono)}
+.slider-row input[type=range]{flex:1;accent-color:var(--accent)}
+.slider-row .val{font-family:var(--mono);font-size:13px;color:var(--accent3);width:40px;text-align:right}
+.controls-panel{background:var(--bg3);border:1px solid var(--border);border-radius:0 0 16px 16px;padding:1.5rem;border-top:none}
+
+/* TABLE */
+.summary-table{width:100%;border-collapse:collapse;font-size:14px;margin-top:1rem}
+.summary-table th{text-align:left;padding:.75rem 1rem;font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--border)}
+.summary-table td{padding:.75rem 1rem;border-bottom:1px solid var(--border);font-family:var(--mono);font-size:13px}
+.summary-table tr:last-child td{border-bottom:none}
+.summary-table td:first-child{color:var(--accent);font-family:var(--font);font-weight:500;font-size:14px}
+.summary-table td:last-child{color:var(--muted);font-family:var(--font)}
+
+/* FOOTER */
+footer{border-top:1px solid var(--border);padding:3rem 2rem;text-align:center;color:var(--muted);font-size:13px}
+</style>
+</head>
+<body>
+
+<nav>
+  <span class="nav-logo">⬡ Geo3D</span>
+  <div class="nav-steps">
+    <a class="nav-step active" href="#punkte">1 · Punkte</a>
+    <a class="nav-step" href="#vektoren">2 · Vektoren</a>
+    <a class="nav-step" href="#rechnen">3 · Rechnen</a>
+    <a class="nav-step" href="#tipps">4 · Tipps</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero" id="start">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+  <div class="hero-content">
+    <div class="hero-tag">Interaktiver 3D Lernweg</div>
+    <h1>Analytische<br/><span>Geometrie</span><br/>im Raum</h1>
+    <p class="hero-sub">Lerne Punkte, Vektoren und Rechenregeln mit echten 3D-Szenen — drehe, zoome, verstehe.</p>
+    <div class="hero-steps">
+      <a class="btn btn-primary" href="#punkte">Jetzt starten →</a>
+      <a class="btn btn-ghost" href="#tipps">Zu den Tipps</a>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     KAPITEL 1 · PUNKTE IM RAUM
+══════════════════════════════════════════ -->
+<section id="punkte">
+<div class="container">
+  <div class="section-label">Kapitel 1</div>
+  <h2 class="section-title">Punkte im Raum</h2>
+  <div class="divider"></div>
+  <p class="section-sub">Ein Punkt P im Raum hat drei Koordinaten: P(x₁ | x₂ | x₃). Drehe die Szene und beobachte, wie die Koordinaten den Punkt im Raum festlegen.</p>
+
+  <div class="scene-card">
+    <div class="scene-header">
+      <div class="scene-title-wrap">
+        <div class="scene-title">3D-Koordinatensystem mit Punkten</div>
+        <div class="scene-hint">🖱 Ziehen = drehen · Scroll = zoomen</div>
+      </div>
+      <div class="scene-controls">
+        <button class="ctrl-btn active" onclick="setScene1Mode('points')">Punkte</button>
+        <button class="ctrl-btn" onclick="setScene1Mode('distance')">Abstand</button>
+        <button class="ctrl-btn" onclick="setScene1Mode('midpoint')">Mittelpunkt</button>
+      </div>
+    </div>
+    <canvas id="c1" class="three"></canvas>
+  </div>
+
+  <div class="formula-box">
+    <div class="formula-label">Abstand zweier Punkte</div>
+    <div class="formula-main">d = √[ (q₁−p₁)² + (q₂−p₂)² + (q₃−p₃)² ]</div>
+    <div class="formula-parts">
+      <span class="formula-part">3D-Pythagoras</span>
+      <span class="formula-part">immer positiv</span>
+      <span class="formula-part">P(p₁|p₂|p₃) → Q(q₁|q₂|q₃)</span>
+    </div>
+  </div>
+
+  <div class="formula-box">
+    <div class="formula-label">Mittelpunkt einer Strecke</div>
+    <div class="formula-main">M = ( (p₁+q₁)/2 | (p₂+q₂)/2 | (p₃+q₃)/2 )</div>
+    <div class="formula-parts">
+      <span class="formula-part">Koordinaten mitteln</span>
+      <span class="formula-part">liegt genau in der Mitte</span>
+    </div>
+  </div>
+
+  <div class="info-grid">
+    <div class="info-card">
+      <div class="info-icon">📍</div>
+      <h3>Koordinatenebenen</h3>
+      <p>Liegt ein Punkt <strong>auf der x₁x₂-Ebene</strong>, ist seine x₃-Koordinate = 0. Auf einer Achse sind die anderen beiden Koordinaten 0.</p>
+      <span class="tag tag-purple">z.B. P(2|3|0) liegt in der x₁x₂-Ebene</span>
+    </div>
+    <div class="info-card">
+      <div class="info-icon">🧮</div>
+      <h3>Achsensystem</h3>
+      <p>x₁ zeigt nach vorne, x₂ nach rechts, x₃ nach oben. Die drei Achsen stehen senkrecht aufeinander — <em>orthogonales System</em>.</p>
+      <span class="tag tag-teal">Rechte-Hand-Regel</span>
+    </div>
+  </div>
+
+  <!-- QUIZ 1 -->
+  <div class="quiz-box">
+    <div class="quiz-q">🧪 Quiz: Welche Koordinate ist 0, wenn P auf der x₂-Achse liegt?</div>
+    <div class="quiz-opts">
+      <button class="quiz-opt" onclick="quiz(this,'wrong')"><span class="opt-letter">A</span> Nur x₁ = 0</button>
+      <button class="quiz-opt" onclick="quiz(this,'wrong')"><span class="opt-letter">B</span> Nur x₃ = 0</button>
+      <button class="quiz-opt" onclick="quiz(this,'correct')"><span class="opt-letter">C</span> x₁ = 0 und x₃ = 0</button>
+      <button class="quiz-opt" onclick="quiz(this,'wrong')"><span class="opt-letter">D</span> Alle drei = 0</button>
+    </div>
+    <div class="quiz-feedback ok">✓ Richtig! Liegt ein Punkt auf einer Achse, sind genau die beiden anderen Koordinaten null.</div>
+    <div class="quiz-feedback err">✗ Nicht ganz. Auf der x₂-Achse gilt: x₁ = 0 und x₃ = 0, nur x₂ bleibt frei.</div>
+  </div>
+</div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     KAPITEL 2 · VEKTOREN
+══════════════════════════════════════════ -->
+<section id="vektoren" style="background:var(--bg2)">
+<div class="container">
+  <div class="section-label">Kapitel 2</div>
+  <h2 class="section-title">Vektoren im Raum</h2>
+  <div class="divider"></div>
+  <p class="section-sub">Ein Vektor beschreibt eine <em>Verschiebung</em> — er hat Länge und Richtung, aber keinen festen Startpunkt. Ziehe die Regler und beobachte die Änderung live in 3D.</p>
+
+  <div class="scene-card" style="border-radius:16px 16px 0 0">
+    <div class="scene-header">
+      <div class="scene-title-wrap">
+        <div class="scene-title">Vektor interaktiv — bewege die Koordinaten</div>
+        <div class="scene-hint">🖱 Drehen · Regler unten verändern den Vektor</div>
+      </div>
+      <div class="scene-controls">
+        <button class="ctrl-btn active" onclick="setScene2Mode('single')">Einzeln</button>
+        <button class="ctrl-btn" onclick="setScene2Mode('types')">Typen</button>
+        <button class="ctrl-btn" onclick="setScene2Mode('collinear')">Kollinear</button>
+      </div>
+    </div>
+    <canvas id="c2" class="three"></canvas>
+  </div>
+  <div class="controls-panel">
+    <div class="slider-row"><label>v₁ (x)</label><input type="range" id="v1" min="-3" max="3" step="0.1" value="2" oninput="updateVec()"/><span class="val" id="lv1">2.0</span></div>
+    <div class="slider-row"><label>v₂ (y)</label><input type="range" id="v2" min="-3" max="3" step="0.1" value="1" oninput="updateVec()"/><span class="val" id="lv2">1.0</span></div>
+    <div class="slider-row"><label>v₃ (z)</label><input type="range" id="v3" min="-3" max="3" step="0.1" value="1.5" oninput="updateVec()"/><span class="val" id="lv3">1.5</span></div>
+    <div style="margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border);display:flex;gap:2rem;flex-wrap:wrap">
+      <span style="font-size:13px;color:var(--muted)">Vektor: <span class="val" style="font-size:15px" id="vecDisplay">(2.0, 1.0, 1.5)</span></span>
+      <span style="font-size:13px;color:var(--muted)">Betrag: <span class="val" style="font-size:15px" id="betrag">|v⃗| = 2.69</span></span>
+    </div>
+  </div>
+
+  <div class="formula-box" style="margin-top:2rem">
+    <div class="formula-label">Verbindungsvektor — „Spitze minus Fuß"</div>
+    <div class="formula-main">AB⃗ = B − A = (b₁−a₁, b₂−a₂, b₃−a₃)</div>
+  </div>
+  <div class="formula-box">
+    <div class="formula-label">Betrag eines Vektors</div>
+    <div class="formula-main">|v⃗| = √(v₁² + v₂² + v₃²)</div>
+    <div class="formula-parts">
+      <span class="formula-part">Länge des Pfeils</span>
+      <span class="formula-part">= Abstand Start → Ende</span>
+    </div>
+  </div>
+
+  <div class="info-grid">
+    <div class="info-card">
+      <div class="info-icon">🏹</div>
+      <h3>Ortsvektor</h3>
+      <p>Geht vom Ursprung O(0|0|0) zum Punkt P. Jeder Punkt bekommt so seinen „eigenen" Vektor. <br/>Schreibweise: <strong>p⃗ = OP⃗</strong></p>
+      <span class="tag tag-yellow">Fester Startpunkt: Ursprung</span>
+    </div>
+    <div class="info-card">
+      <div class="info-icon">🧭</div>
+      <h3>Richtungsvektor</h3>
+      <p>Gibt nur eine Richtung vor — kein fester Startpunkt. Kann beliebig parallel verschoben werden. Wichtig bei Geraden.</p>
+      <span class="tag tag-purple">Kein fester Startpunkt</span>
+    </div>
+    <div class="info-card">
+      <div class="info-icon">↔️</div>
+      <h3>Gegenvektor</h3>
+      <p>Der Gegenvektor zu <strong>a⃗</strong> ist <strong>−a⃗</strong>. Gleich lang, gleiche Achse — aber entgegengesetzte Richtung.</p>
+      <span class="tag tag-red">Richtungsumkehr</span>
+    </div>
+    <div class="info-card">
+      <div class="info-icon">⚖️</div>
+      <h3>Kollinearität</h3>
+      <p>Zwei Vektoren sind kollinear (parallel), wenn einer ein Vielfaches des anderen ist:<br/><strong>a⃗ = r · b⃗</strong></p>
+      <span class="tag tag-teal">a⃗ = r · b⃗</span>
+    </div>
+  </div>
+
+  <div class="quiz-box">
+    <div class="quiz-q">🧪 Quiz: Was ergibt der Betrag von v⃗ = (3, 0, 4)?</div>
+    <div class="quiz-opts">
+      <button class="quiz-opt" onclick="quiz(this,'wrong')"><span class="opt-letter">A</span> 7</button>
+      <button class="quiz-opt" onclick="quiz(this,'correct')"><span class="opt-letter">B</span> 5</button>
+      <button class="quiz-opt" onclick="quiz(this,'wrong')"><span class="opt-letter">C</span> √7</button>
+      <button class="quiz-opt" onclick="quiz(this,'wrong')"><span class="opt-letter">D</span> 25</button>
+    </div>
+    <div class="quiz-feedback ok">✓ Richtig! √(9 + 0 + 16) = √25 = 5. Ein klassischer 3-4-5-Pythagoras!</div>
+    <div class="quiz-feedback err">✗ Denk nochmal: |v⃗| = √(3² + 0² + 4²) = √(9+0+16) = √25 = 5.</div>
+  </div>
+</div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     KAPITEL 3 · RECHNEN MIT VEKTOREN
+══════════════════════════════════════════ -->
+<section id="rechnen">
+<div class="container">
+  <div class="section-label">Kapitel 3</div>
+  <h2 class="section-title">Rechnen mit Vektoren</h2>
+  <div class="divider"></div>
+  <p class="section-sub">Addition, Subtraktion, Skalarmultiplikation — geometrisch und rechnerisch verstehen.</p>
+
+  <div class="scene-card">
+    <div class="scene-header">
+      <div class="scene-title-wrap">
+        <div class="scene-title">Vektoroperationen in 3D</div>
+        <div class="scene-hint">🖱 Drehen um zu sehen wie die Pfeile zusammenpassen</div>
+      </div>
+      <div class="scene-controls">
+        <button class="ctrl-btn active" onclick="setScene3Mode('add')">a⃗ + b⃗</button>
+        <button class="ctrl-btn" onclick="setScene3Mode('sub')">a⃗ − b⃗</button>
+        <button class="ctrl-btn" onclick="setScene3Mode('scalar')">r · a⃗</button>
+      </div>
+    </div>
+    <canvas id="c3" class="three"></canvas>
+  </div>
+
+  <div class="info-grid">
+    <div class="info-card">
+      <div class="info-icon">➕</div>
+      <h3>Addition</h3>
+      <p>Pfeile aneinanderhängen. Koordinatenweise addieren.</p>
+      <div class="formula-box" style="margin-top:.75rem;padding:1rem">
+        <div class="formula-main" style="font-size:14px">a⃗ + b⃗ = (a₁+b₁, a₂+b₂, a₃+b₃)</div>
+      </div>
+      <span class="tag tag-teal">Geometrisch: Pfeile hintereinander</span>
+    </div>
+    <div class="info-card">
+      <div class="info-icon">➖</div>
+      <h3>Subtraktion</h3>
+      <p>Gegenvektor anhängen: a⃗ − b⃗ = a⃗ + (−b⃗)</p>
+      <div class="formula-box" style="margin-top:.75rem;padding:1rem">
+        <div class="formula-main" style="font-size:14px">a⃗ − b⃗ = (a₁−b₁, a₂−b₂, a₃−b₃)</div>
+      </div>
+      <span class="tag tag-red">Geometrisch: Differenzpfeil</span>
+    </div>
+    <div class="info-card">
+      <div class="info-icon">✖️</div>
+      <h3>Skalarmultiplikation</h3>
+      <p>Jede Koordinate mit dem Skalar r multiplizieren. Streckt, staucht oder dreht den Pfeil.</p>
+      <div class="formula-box" style="margin-top:.75rem;padding:1rem">
+        <div class="formula-main" style="font-size:14px">r · a⃗ = (r·a₁, r·a₂, r·a₃)</div>
+      </div>
+      <span class="tag tag-yellow">r&gt;1: strecken · 0&lt;r&lt;1: stauchen · r&lt;0: umkehren</span>
+    </div>
+    <div class="info-card">
+      <div class="info-icon">∥</div>
+      <h3>Kollinearität prüfen</h3>
+      <p>Gibt es ein r, sodass a⃗ = r · b⃗? Dann sind die Vektoren parallel (kollinear).</p>
+      <div class="formula-box" style="margin-top:.75rem;padding:1rem">
+        <div class="formula-main" style="font-size:14px">r = a₁/b₁ → Prüfe ob = a₂/b₂ = a₃/b₃</div>
+      </div>
+      <span class="tag tag-purple">Quotienten vergleichen</span>
+    </div>
+  </div>
+
+  <div class="quiz-box">
+    <div class="quiz-q">🧪 Quiz: Was ist 3 · (1, −2, 0)?</div>
+    <div class="quiz-opts">
+      <button class="quiz-opt" onclick="quiz(this,'wrong')"><span class="opt-letter">A</span> (1, −2, 0)</button>
+      <button class="quiz-opt" onclick="quiz(this,'correct')"><span class="opt-letter">B</span> (3, −6, 0)</button>
+      <button class="quiz-opt" onclick="quiz(this,'wrong')"><span class="opt-letter">C</span> (3, 2, 0)</button>
+      <button class="quiz-opt" onclick="quiz(this,'wrong')"><span class="opt-letter">D</span> (4, −1, 3)</button>
+    </div>
+    <div class="quiz-feedback ok">✓ Richtig! Jede Koordinate × 3: (3·1, 3·(−2), 3·0) = (3, −6, 0).</div>
+    <div class="quiz-feedback err">✗ Jede Koordinate wird mit 3 multipliziert: 3·1=3, 3·(−2)=−6, 3·0=0 → (3, −6, 0).</div>
+  </div>
+</div>
+</section>
+
+<!-- ══════════════════════════════════════════
+     KAPITEL 4 · TIPPS & AUFGABEN
+══════════════════════════════════════════ -->
+<section id="tipps" style="background:var(--bg2)">
+<div class="container">
+  <div class="section-label">Kapitel 4</div>
+  <h2 class="section-title">Typische Aufgabenstellungen</h2>
+  <div class="divider"></div>
+  <p class="section-sub">Die häufigsten Aufgabentypen im Überblick — mit Vorgehensweise und 3D-Veranschaulichung.</p>
+
+  <div class="scene-card">
+    <div class="scene-header">
+      <div class="scene-title-wrap">
+        <div class="scene-title">Geometrische Figuren im Raum</div>
+        <div class="scene-hint">🖱 Drehen um Parallelogramm / Dreieck zu erkunden</div>
+      </div>
+      <div class="scene-controls">
+        <button class="ctrl-btn active" onclick="setScene4Mode('para')">Parallelogramm</button>
+        <button class="ctrl-btn" onclick="setScene4Mode('tri')">Dreieck</button>
+        <button class="ctrl-btn" onclick="setScene4Mode('miss')">Eckpunkt D</button>
+      </div>
+    </div>
+    <canvas id="c4" class="three"></canvas>
+  </div>
+
+  <table class="summary-table">
+    <thead>
+      <tr><th>Aufgabentyp</th><th>Vorgehen</th><th>Schlüsselformel</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Rechtwinkligkeit prüfen</td>
+        <td>Seitenlängen mit Betragsformel berechnen, dann Pythagoras prüfen</td>
+        <td>a² + b² = c²</td>
+      </tr>
+      <tr>
+        <td>Parallelogramm nachweisen</td>
+        <td>Zeige: gegenüberliegende Seiten gleich lang UND parallel</td>
+        <td>AB⃗ = DC⃗</td>
+      </tr>
+      <tr>
+        <td>Fehlenden Eckpunkt finden</td>
+        <td>Ortsvektor + Verschiebungsvektor = gesuchter Punkt</td>
+        <td>OD⃗ = OA⃗ + BC⃗</td>
+      </tr>
+      <tr>
+        <td>Kollinearität prüfen</td>
+        <td>Quotient jeder Koordinate bilden — gleich? → kollinear</td>
+        <td>a⃗ = r · b⃗</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="quiz-box" style="margin-top:2rem">
+    <div class="quiz-q">🧪 Quiz: Gegeben ABCD ist ein Parallelogramm mit A(1|0|0), B(3|1|0), C(4|3|0). Wo liegt D?</div>
+    <div class="quiz-opts">
+      <button class="quiz-opt" onclick="quiz(this,'wrong')"><span class="opt-letter">A</span> D(3|2|0)</button>
+      <button class="quiz-opt" onclick="quiz(this,'correct')"><span class="opt-letter">B</span> D(2|2|0)</button>
+      <button class="quiz-opt" onclick="quiz(this,'wrong')"><span class="opt-letter">C</span> D(5|4|0)</button>
+      <button class="quiz-opt" onclick="quiz(this,'wrong')"><span class="opt-letter">D</span> D(0|−1|0)</button>
+    </div>
+    <div class="quiz-feedback ok">✓ Richtig! OD⃗ = OA⃗ + BC⃗ = (1,0,0) + (1,2,0) = (2,2,0) → D(2|2|0).</div>
+    <div class="quiz-feedback err">✗ Verwende: OD⃗ = OA⃗ + BC⃗. BC⃗ = C−B = (1,2,0). Also OD⃗ = (1+1, 0+2, 0+0) = (2,2,0).</div>
+  </div>
+</div>
+</section>
+
+<footer>
+  <p>Analytische Geometrie – 3D Lernweg · Alle Grafiken interaktiv mit Three.js</p>
+</footer>
+
+<!-- THREE.JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+// ══════════════════════
+// SHARED UTILITIES
+// ══════════════════════
+function makeRenderer(canvas){
+  const r=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true});
+  r.setPixelRatio(window.devicePixelRatio);
+  r.setClearColor(0x1e1e2e,1);
+  r.setSize(canvas.offsetWidth||700,380);
+  return r;
+}
+function makeCamera(fov=50){
+  const cam=new THREE.PerspectiveCamera(fov,700/380,0.1,100);
+  cam.position.set(6,5,7);
+  cam.lookAt(0,0,0);
+  return cam;
+}
+function addAxes(scene,size=4){
+  const mat={x:new THREE.LineBasicMaterial({color:0xf76c6c}),y:new THREE.LineBasicMaterial({color:0x6cf7a0}),z:new THREE.LineBasicMaterial({color:0x7c6af7})};
+  [[1,0,0,'mat'],[0,1,0],[0,0,1]].forEach((_,i)=>{
+    const dirs=[[1,0,0],[0,1,0],[0,0,1]];
+    const cols=[0xf76c6c,0x6cf7a0,0x7c6af7];
+    const m=new THREE.LineBasicMaterial({color:cols[i]});
+    const g=new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0,0,0),new THREE.Vector3(...dirs[i].map(v=>v*size))]);
+    scene.add(new THREE.Line(g,m));
+  });
+  // Labels via sprites
+  addLabel(scene,'x₂',new THREE.Vector3(size+0.3,0,0),0xf76c6c);
+  addLabel(scene,'x₃',new THREE.Vector3(0,size+0.3,0),0x6cf7a0);
+  addLabel(scene,'x₁',new THREE.Vector3(0,0,size+0.3),0x7c6af7);
+  // Grid
+  const grid=new THREE.GridHelper(8,8,0x2a2a40,0x2a2a40);
+  scene.add(grid);
+}
+function addLabel(scene,text,pos,color=0xffffff){
+  const canvas=document.createElement('canvas');
+  canvas.width=128;canvas.height=64;
+  const ctx=canvas.getContext('2d');
+  ctx.font='bold 28px Space Grotesk,sans-serif';
+  ctx.fillStyle='#'+color.toString(16).padStart(6,'0');
+  ctx.textAlign='center';ctx.textBaseline='middle';
+  ctx.fillText(text,64,32);
+  const tex=new THREE.CanvasTexture(canvas);
+  const mat=new THREE.SpriteMaterial({map:tex,transparent:true});
+  const sprite=new THREE.Sprite(mat);
+  sprite.position.copy(pos);
+  sprite.scale.set(0.7,0.35,1);
+  scene.add(sprite);
+}
+function makeArrow(from,to,color,scene,headLen=0.25){
+  const dir=new THREE.Vector3().subVectors(to,from).normalize();
+  const len=from.distanceTo(to);
+  const arrow=new THREE.ArrowHelper(dir,from,len,color,headLen,0.12);
+  scene.add(arrow);return arrow;
+}
+function makePoint(pos,color,scene,r=0.1){
+  const mesh=new THREE.Mesh(new THREE.SphereGeometry(r,16,16),new THREE.MeshLambertMaterial({color}));
+  mesh.position.copy(pos);scene.add(mesh);return mesh;
+}
+function makeLine(p1,p2,color,scene,dashed=false){
+  const mat=dashed?new THREE.LineDashedMaterial({color,dashSize:0.2,gapSize:0.1}):new THREE.LineBasicMaterial({color});
+  const g=new THREE.BufferGeometry().setFromPoints([p1,p2]);
+  const l=new THREE.Line(g,mat);
+  if(dashed)l.computeLineDistances();
+  scene.add(l);return l;
+}
+function addAmbient(scene){
+  scene.add(new THREE.AmbientLight(0xffffff,0.7));
+  const d=new THREE.DirectionalLight(0xffffff,0.5);d.position.set(5,8,6);scene.add(d);
+}
+function orbitControl(renderer,camera){
+  let drag=false,lastX=0,lastY=0,theta=0.8,phi=0.7,radius=camera.position.length();
+  const el=renderer.domElement;
+  el.addEventListener('mousedown',e=>{drag=true;lastX=e.clientX;lastY=e.clientY});
+  el.addEventListener('touchstart',e=>{drag=true;lastX=e.touches[0].clientX;lastY=e.touches[0].clientY},{passive:true});
+  window.addEventListener('mouseup',()=>drag=false);
+  window.addEventListener('touchend',()=>drag=false);
+  function move(dx,dy){theta-=dx*0.008;phi=Math.max(0.1,Math.min(Math.PI-0.1,phi+dy*0.008));camera.position.set(radius*Math.sin(phi)*Math.sin(theta),radius*Math.cos(phi),radius*Math.sin(phi)*Math.cos(theta));camera.lookAt(0,0,0);}
+  window.addEventListener('mousemove',e=>{if(drag){move(e.clientX-lastX,e.clientY-lastY);lastX=e.clientX;lastY=e.clientY;}});
+  window.addEventListener('touchmove',e=>{if(drag){move(e.touches[0].clientX-lastX,e.touches[0].clientY-lastY);lastX=e.touches[0].clientX;lastY=e.touches[0].clientY;}},{passive:true});
+  el.addEventListener('wheel',e=>{radius=Math.max(3,Math.min(20,radius+e.deltaY*0.01));camera.position.set(radius*Math.sin(phi)*Math.sin(theta),radius*Math.cos(phi),radius*Math.sin(phi)*Math.cos(theta));camera.lookAt(0,0,0);},{passive:true});
+}
+
+// ══════════════════════
+// SCENE 1 – PUNKTE
+// ══════════════════════
+let s1={mode:'points',renderer:null,scene:null,camera:null,objects:[]};
+(function initS1(){
+  const canvas=document.getElementById('c1');
+  s1.renderer=makeRenderer(canvas);
+  s1.camera=makeCamera();
+  s1.scene=new THREE.Scene();
+  addAmbient(s1.scene);
+  orbitControl(s1.renderer,s1.camera);
+  buildScene1();
+  (function loop(){requestAnimationFrame(loop);s1.renderer.setSize(canvas.offsetWidth||700,380);s1.camera.aspect=(canvas.offsetWidth||700)/380;s1.camera.updateProjectionMatrix();s1.renderer.render(s1.scene,s1.camera);})();
+})();
+function buildScene1(){
+  s1.objects.forEach(o=>s1.scene.remove(o));s1.objects=[];
+  addAxes(s1.scene);
+  const P=new THREE.Vector3(2,3,1);
+  const Q=new THREE.Vector3(-1,1,3);
+  function addObj(o){s1.scene.add(o);s1.objects.push(o);}
+
+  if(s1.mode==='points'){
+    addObj(makePoint(P,0x7c6af7,s1.scene));
+    addObj(makePoint(Q,0x4ecdc4,s1.scene));
+    addLabel(s1.scene,'P(2|3|1)',P.clone().add(new THREE.Vector3(0.3,0.3,0)),0x7c6af7);
+    addLabel(s1.scene,'Q(−1|1|3)',Q.clone().add(new THREE.Vector3(0.3,0.3,0)),0x4ecdc4);
+    // dashed projections
+    [0,1,2].forEach(i=>{
+      const proj=P.clone();if(i!==0)proj.x=0;if(i!==1)proj.y=0;if(i!==2)proj.z=0;
+      const g=new THREE.BufferGeometry().setFromPoints([P,proj]);
+      const l=new THREE.Line(g,new THREE.LineDashedMaterial({color:0x7c6af7,dashSize:0.15,gapSize:0.08,opacity:0.4,transparent:true}));
+      l.computeLineDistances();addObj(l);
+    });
+  } else if(s1.mode==='distance'){
+    addObj(makePoint(P,0x7c6af7,s1.scene));
+    addObj(makePoint(Q,0x4ecdc4,s1.scene));
+    const a=makeArrow(P,Q,0xf7c948,s1.scene);addObj(a);
+    const mid=P.clone().lerp(Q,0.5);
+    const d=P.distanceTo(Q).toFixed(2);
+    addLabel(s1.scene,'d≈'+d,mid.clone().add(new THREE.Vector3(0.3,0.3,0)),0xf7c948);
+    addLabel(s1.scene,'P',P.clone().add(new THREE.Vector3(0.3,0.2,0)),0x7c6af7);
+    addLabel(s1.scene,'Q',Q.clone().add(new THREE.Vector3(0.3,0.2,0)),0x4ecdc4);
+  } else {
+    const M=P.clone().lerp(Q,0.5);
+    addObj(makePoint(P,0x7c6af7,s1.scene));
+    addObj(makePoint(Q,0x4ecdc4,s1.scene));
+    addObj(makePoint(M,0xf7c948,s1.scene,.14));
+    const a=makeArrow(P,Q,0x444464,s1.scene);addObj(a);
+    addLabel(s1.scene,'M (Mittelpunkt)',M.clone().add(new THREE.Vector3(0.3,0.3,0)),0xf7c948);
+  }
+}
+function setScene1Mode(m){
+  s1.mode=m;
+  document.querySelectorAll('#c1~* .ctrl-btn, .scene-card:first-of-type .ctrl-btn').forEach(b=>b.classList.remove('active'));
+  event.target.classList.add('active');
+  buildScene1();
+}
+
+// ══════════════════════
+// SCENE 2 – VEKTOREN INTERAKTIV
+// ══════════════════════
+let s2={mode:'single',renderer:null,scene:null,camera:null,objects:[],v:new THREE.Vector3(2,1,1.5)};
+(function initS2(){
+  const canvas=document.getElementById('c2');
+  s2.renderer=makeRenderer(canvas);
+  s2.camera=makeCamera();
+  s2.scene=new THREE.Scene();
+  addAmbient(s2.scene);
+  orbitControl(s2.renderer,s2.camera);
+  buildScene2();
+  (function loop(){requestAnimationFrame(loop);s2.renderer.setSize(canvas.offsetWidth||700,380);s2.camera.aspect=(canvas.offsetWidth||700)/380;s2.camera.updateProjectionMatrix();s2.renderer.render(s2.scene,s2.camera);})();
+})();
+function buildScene2(){
+  s2.objects.forEach(o=>s2.scene.remove(o));s2.objects=[];
+  addAxes(s2.scene);
+  function addObj(o){s2.scene.add(o);s2.objects.push(o);}
+  const O=new THREE.Vector3(0,0,0);
+  const v=s2.v.clone();
+
+  if(s2.mode==='single'){
+    const a=makeArrow(O,v,0x7c6af7,s2.scene);addObj(a);
+    addObj(makePoint(v,0x7c6af7,s2.scene));
+    // component lines
+    const px=new THREE.Vector3(v.x,0,0),py=new THREE.Vector3(v.x,v.y,0);
+    makeLine(O,px,0xf76c6c,s2.scene,true);s2.objects.push(...s2.scene.children.slice(-1));
+    makeLine(px,py,0x6cf7a0,s2.scene,true);s2.objects.push(...s2.scene.children.slice(-1));
+    makeLine(py,v,0x7c6af7,s2.scene,true);s2.objects.push(...s2.scene.children.slice(-1));
+    addLabel(s2.scene,'v⃗',v.clone().add(new THREE.Vector3(0.3,0.3,0)),0x7c6af7);
+  } else if(s2.mode==='types'){
+    // ortsvektor
+    const A=new THREE.Vector3(1,2,1);
+    const oa=makeArrow(O,A,0x7c6af7,s2.scene);addObj(oa);
+    addLabel(s2.scene,'OA⃗ (Ortsvektor)',A.clone().add(new THREE.Vector3(0.2,0.2,0)),0x7c6af7);
+    // Verbindungsvektor
+    const B=new THREE.Vector3(3,3,2);
+    addObj(makePoint(A,0x7c6af7,s2.scene,.09));
+    addObj(makePoint(B,0x4ecdc4,s2.scene,.09));
+    const ab=makeArrow(A,B,0x4ecdc4,s2.scene);addObj(ab);
+    addLabel(s2.scene,'AB⃗',A.clone().lerp(B,0.5).add(new THREE.Vector3(0.2,0.2,0)),0x4ecdc4);
+    // Gegenvektor
+    const neg=v.clone().negate();
+    const gv=makeArrow(O,neg,0xf7c948,s2.scene);addObj(gv);
+    addLabel(s2.scene,'−v⃗',neg.clone().add(new THREE.Vector3(0.2,0,0)),0xf7c948);
+    const fwd=makeArrow(O,v,0xf76c6c,s2.scene);addObj(fwd);
+    addLabel(s2.scene,'v⃗',v.clone().add(new THREE.Vector3(0.2,0.2,0)),0xf76c6c);
+  } else {
+    // kollinear: v und 2v
+    const v2=v.clone().multiplyScalar(2);
+    const a1=makeArrow(O,v,0x7c6af7,s2.scene);addObj(a1);
+    const a2=makeArrow(O,v2,0x4ecdc4,s2.scene);addObj(a2);
+    addLabel(s2.scene,'v⃗',v.clone().add(new THREE.Vector3(0.3,0.2,0)),0x7c6af7);
+    addLabel(s2.scene,'2·v⃗ (kollinear)',v2.clone().add(new THREE.Vector3(0.3,0.2,0)),0x4ecdc4);
+    // not collinear
+    const w=new THREE.Vector3(1,2.5,0.5);
+    const a3=makeArrow(O,w,0xf76c6c,s2.scene);addObj(a3);
+    addLabel(s2.scene,'w⃗ (nicht kollinear)',w.clone().add(new THREE.Vector3(0.3,0.2,0)),0xf76c6c);
+  }
+}
+function updateVec(){
+  const v1=parseFloat(document.getElementById('v1').value);
+  const v2=parseFloat(document.getElementById('v2').value);
+  const v3=parseFloat(document.getElementById('v3').value);
+  document.getElementById('lv1').textContent=v1.toFixed(1);
+  document.getElementById('lv2').textContent=v2.toFixed(1);
+  document.getElementById('lv3').textContent=v3.toFixed(1);
+  s2.v.set(v1,v2,v3);
+  const len=Math.sqrt(v1*v1+v2*v2+v3*v3).toFixed(2);
+  document.getElementById('vecDisplay').textContent=`(${v1.toFixed(1)}, ${v2.toFixed(1)}, ${v3.toFixed(1)})`;
+  document.getElementById('betrag').textContent=`|v⃗| = ${len}`;
+  if(s2.mode==='single')buildScene2();
+}
+function setScene2Mode(m){
+  s2.mode=m;
+  document.querySelectorAll('#c2').forEach(c=>{c.parentElement.querySelectorAll('.ctrl-btn').forEach(b=>b.classList.remove('active'));});
+  event.target.classList.add('active');
+  buildScene2();
+}
+
+// ══════════════════════
+// SCENE 3 – OPERATIONEN
+// ══════════════════════
+let s3={mode:'add',renderer:null,scene:null,camera:null,objects:[]};
+let s3anim=0;
+(function initS3(){
+  const canvas=document.getElementById('c3');
+  s3.renderer=makeRenderer(canvas);
+  s3.camera=makeCamera();
+  s3.scene=new THREE.Scene();
+  addAmbient(s3.scene);
+  orbitControl(s3.renderer,s3.camera);
+  buildScene3();
+  (function loop(){requestAnimationFrame(loop);s3anim+=0.005;s3.renderer.setSize(canvas.offsetWidth||700,380);s3.camera.aspect=(canvas.offsetWidth||700)/380;s3.camera.updateProjectionMatrix();s3.renderer.render(s3.scene,s3.camera);})();
+})();
+function buildScene3(){
+  s3.objects.forEach(o=>s3.scene.remove(o));s3.objects=[];
+  addAxes(s3.scene);
+  function addObj(o){s3.scene.add(o);s3.objects.push(o);}
+  const O=new THREE.Vector3(0,0,0);
+  const a=new THREE.Vector3(2,1,0);
+  const b=new THREE.Vector3(0,2,1.5);
+
+  if(s3.mode==='add'){
+    const sum=a.clone().add(b);
+    const aa=makeArrow(O,a,0x7c6af7,s3.scene);addObj(aa);
+    const ab=makeArrow(a,a.clone().add(b),0x4ecdc4,s3.scene);addObj(ab);
+    const ar=makeArrow(O,sum,0xf7c948,s3.scene);addObj(ar);
+    addLabel(s3.scene,'a⃗',a.clone().add(new THREE.Vector3(0.2,0.2,0)),0x7c6af7);
+    addLabel(s3.scene,'b⃗',a.clone().lerp(sum,0.5).add(new THREE.Vector3(0.2,0.2,0)),0x4ecdc4);
+    addLabel(s3.scene,'a⃗+b⃗',sum.clone().add(new THREE.Vector3(0.3,0.2,0)),0xf7c948);
+  } else if(s3.mode==='sub'){
+    const diff=a.clone().sub(b);
+    const negB=b.clone().negate();
+    const aa=makeArrow(O,a,0x7c6af7,s3.scene);addObj(aa);
+    const anb=makeArrow(a,a.clone().add(negB),0xf76c6c,s3.scene);addObj(anb);
+    const ar=makeArrow(O,diff,0xf7c948,s3.scene);addObj(ar);
+    addLabel(s3.scene,'a⃗',a.clone().add(new THREE.Vector3(0.2,0.2,0)),0x7c6af7);
+    addLabel(s3.scene,'−b⃗',a.clone().lerp(a.clone().add(negB),0.5).add(new THREE.Vector3(0.2,0.2,0)),0xf76c6c);
+    addLabel(s3.scene,'a⃗−b⃗',diff.clone().add(new THREE.Vector3(0.3,0.2,0)),0xf7c948);
+  } else {
+    const scalars=[2,1,0.5,-1];
+    const cols=[0x7c6af7,0x4ecdc4,0xf7c948,0xf76c6c];
+    const labels=['2·a⃗','a⃗','0.5·a⃗','−a⃗'];
+    scalars.forEach((r,i)=>{
+      const scaled=a.clone().multiplyScalar(r);
+      const arr=makeArrow(O,scaled,cols[i],s3.scene);addObj(arr);
+      addLabel(s3.scene,labels[i],scaled.clone().add(new THREE.Vector3(0.3,0.2,0)),cols[i]);
+    });
+  }
+}
+function setScene3Mode(m){
+  s3.mode=m;
+  event.target.closest('.scene-card').querySelectorAll('.ctrl-btn').forEach(b=>b.classList.remove('active'));
+  event.target.classList.add('active');
+  buildScene3();
+}
+
+// ══════════════════════
+// SCENE 4 – FIGUREN
+// ══════════════════════
+let s4={mode:'para',renderer:null,scene:null,camera:null,objects:[]};
+(function initS4(){
+  const canvas=document.getElementById('c4');
+  s4.renderer=makeRenderer(canvas);
+  s4.camera=makeCamera(45);
+  s4.scene=new THREE.Scene();
+  addAmbient(s4.scene);
+  orbitControl(s4.renderer,s4.camera);
+  buildScene4();
+  (function loop(){requestAnimationFrame(loop);s4.renderer.setSize(canvas.offsetWidth||700,380);s4.camera.aspect=(canvas.offsetWidth||700)/380;s4.camera.updateProjectionMatrix();s4.renderer.render(s4.scene,s4.camera);})();
+})();
+function buildScene4(){
+  s4.objects.forEach(o=>s4.scene.remove(o));s4.objects=[];
+  addAxes(s4.scene,3);
+  function addObj(o){s4.scene.add(o);s4.objects.push(o);}
+  const cols=[0x7c6af7,0x4ecdc4,0xf7c948,0xf76c6c];
+
+  if(s4.mode==='para'){
+    const A=new THREE.Vector3(0,0,0),B=new THREE.Vector3(2,0,0),C=new THREE.Vector3(3,2,0),D=new THREE.Vector3(1,2,0);
+    [A,B,C,D].forEach((p,i)=>{addObj(makePoint(p,cols[i],s4.scene,.12));});
+    [[A,B],[B,C],[C,D],[D,A]].forEach(([p,q],i)=>{const l=makeArrow(p,q,cols[i],s4.scene);addObj(l);});
+    ['A(0|0|0)','B(2|0|0)','C(3|2|0)','D(1|2|0)'].forEach((lbl,i)=>{
+      const pts=[A,B,C,D];addLabel(s4.scene,lbl,pts[i].clone().add(new THREE.Vector3(0,0.35,0)),cols[i]);
+    });
+    // AB und DC gleichfarbig markieren
+    const m=new THREE.ArrowHelper(new THREE.Vector3(1,0,0),D,2,0xf76c6c,0.25,0.12);addObj(m);
+    addLabel(s4.scene,'AB⃗ = DC⃗',new THREE.Vector3(2,2.5,0),0xf76c6c);
+  } else if(s4.mode==='tri'){
+    const A=new THREE.Vector3(0,0,0),B=new THREE.Vector3(3,0,0),C=new THREE.Vector3(1.5,0,2.5);
+    [A,B,C].forEach((p,i)=>{addObj(makePoint(p,cols[i],s4.scene,.12));});
+    [[A,B,0],[B,C,1],[C,A,2]].forEach(([p,q,i])=>{const l=makeArrow(p,q,cols[i],s4.scene);addObj(l);});
+    const ab=A.distanceTo(B).toFixed(2),bc=B.distanceTo(C).toFixed(2),ca=C.distanceTo(A).toFixed(2);
+    addLabel(s4.scene,'|AB|='+ab,new THREE.Vector3(1.5,-0.5,0),0x7c6af7);
+    addLabel(s4.scene,'|BC|='+bc,new THREE.Vector3(2.5,0.5,1.5),0x4ecdc4);
+    addLabel(s4.scene,'|CA|='+ca,new THREE.Vector3(0.5,0.5,1.5),0xf7c948);
+    // check right angle
+    const v1=B.clone().sub(A),v2=C.clone().sub(A);
+    const dot=v1.dot(v2);
+    addLabel(s4.scene,Math.abs(dot)<0.01?'✓ rechtwinklig':'kein rechter Winkel bei A',new THREE.Vector3(0,2.5,0),0x6cf7a0);
+  } else {
+    // find missing D
+    const A=new THREE.Vector3(1,0,0),B=new THREE.Vector3(3,1,0),C=new THREE.Vector3(4,3,0);
+    const BC=C.clone().sub(B);
+    const D=A.clone().add(BC);
+    [A,B,C,D].forEach((p,i)=>{addObj(makePoint(p,cols[i],s4.scene,.12));});
+    [[A,B],[B,C],[C,D]].forEach(([p,q],i)=>{const l=makeArrow(p,q,cols[i],s4.scene);addObj(l);});
+    const dashed=new THREE.Line(new THREE.BufferGeometry().setFromPoints([D,A]),new THREE.LineDashedMaterial({color:0xf76c6c,dashSize:0.2,gapSize:0.1}));
+    dashed.computeLineDistances();addObj(dashed);
+    ['A','B','C','D (gesucht)'].forEach((lbl,i)=>{
+      const pts=[A,B,C,D];addLabel(s4.scene,lbl,pts[i].clone().add(new THREE.Vector3(0,0.4,0)),cols[i]);
+    });
+    const arBC=makeArrow(A,A.clone().add(BC),0x4ecdc4,s4.scene);addObj(arBC);
+    addLabel(s4.scene,'BC⃗ von A',new THREE.Vector3(1.5,2,0),0x4ecdc4);
+    addLabel(s4.scene,'OD = OA + BC',new THREE.Vector3(-0.5,3,0),0xf76c6c);
+  }
+}
+function setScene4Mode(m){
+  s4.mode=m;
+  event.target.closest('.scene-card').querySelectorAll('.ctrl-btn').forEach(b=>b.classList.remove('active'));
+  event.target.classList.add('active');
+  buildScene4();
+}
+
+// ══════════════════════
+// QUIZ LOGIC
+// ══════════════════════
+function quiz(btn,type){
+  const box=btn.closest('.quiz-box');
+  if(box.dataset.answered)return;
+  box.dataset.answered='1';
+  box.querySelectorAll('.quiz-opt').forEach(b=>b.style.pointerEvents='none');
+  btn.classList.add(type==='correct'?'correct':'wrong');
+  const feedbacks=box.querySelectorAll('.quiz-feedback');
+  feedbacks[0].classList.toggle('show',type==='correct');
+  feedbacks[1].classList.toggle('show',type!=='correct');
+}
+
+// ══════════════════════
+// NAV ACTIVE STATE
+// ══════════════════════
+const sections=document.querySelectorAll('section[id]');
+const navLinks=document.querySelectorAll('.nav-step');
+window.addEventListener('scroll',()=>{
+  let cur='';
+  sections.forEach(s=>{if(window.scrollY>=s.offsetTop-120)cur=s.id;});
+  navLinks.forEach(a=>{a.classList.toggle('active',a.getAttribute('href')==='#'+cur);});
+},{passive:true});
+</script>
+</body>
+</html>
